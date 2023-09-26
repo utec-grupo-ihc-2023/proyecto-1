@@ -1,14 +1,17 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Barracuda;
 using UnityEngine;
+using UnityEngine.XR.ARFoundation;
+using UnityEngine.XR.ARSubsystems;
 
 public class YOLO : MonoBehaviour
 {
     public NNModel nnModel;
 
-    public Camera inputCamera;
+    public ARCameraManager inputCamera;
 
     public TMP_Text outputText;
 
@@ -25,13 +28,22 @@ public class YOLO : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(inputCamera.TryAcquireLatestCpuImage(out XRCpuImage image))
+        {
+            outputText.text = Run(image).ToString();
 
-        // TODO: Update text with the model output
-        outputText.text = "a";
+            image.Dispose();
+        }
     }
 
     void OnDestroy()
     {
         worker.Dispose();
+    }
+
+    char Run(XRCpuImage image)
+    {
+        // TODO: Update text with the model output
+        return 'a';
     }
 }
