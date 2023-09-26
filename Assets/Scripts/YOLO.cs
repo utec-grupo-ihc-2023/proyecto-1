@@ -10,7 +10,7 @@ public class YOLO : MonoBehaviour
 
     public Camera inputCamera;
 
-    public TextMeshProUGUI outputText;
+    public TMP_Text outputText;
 
     // Start is called before the first frame update
     void Start()
