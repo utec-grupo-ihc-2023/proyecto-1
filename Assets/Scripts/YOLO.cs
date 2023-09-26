@@ -52,9 +52,14 @@ public class YOLO : MonoBehaviour
     {
         Tensor input = new(texture2D);
 
-        // TODO: Update text with the model output
+        // TODO: Preprocess input
+
+        Tensor output = worker.Execute(input).PeekOutput();
+
+        // TODO: Postprocess output
 
         input.Dispose();
+        output.Dispose();
         return 'a';
     }
 }
