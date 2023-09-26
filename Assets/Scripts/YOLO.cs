@@ -1,11 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Barracuda;
 using UnityEngine;
 
 public class YOLO : MonoBehaviour
 {
     public NNModel model;
+
+    public Camera inputCamera;
+
+    public TextMeshProUGUI outputText;
 
     // Start is called before the first frame update
     void Start()
@@ -16,6 +21,7 @@ public class YOLO : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        // TODO: Update text with the model output
+        outputText.text = "a";
     }
 }
