@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using TMPro;
 using Unity.Barracuda;
 using UnityEngine;
@@ -30,7 +31,7 @@ public class YOLO : MonoBehaviour
     {
         if(inputCamera.TryAcquireLatestCpuImage(out XRCpuImage image))
         {
-            outputText.text = Run(image).ToString();
+            outputText.text = Run(ProcessImage(image)).ToString();
 
             image.Dispose();
         }
@@ -41,9 +42,19 @@ public class YOLO : MonoBehaviour
         worker.Dispose();
     }
 
-    char Run(XRCpuImage image)
+    Texture2D ProcessImage(XRCpuImage image)
     {
+        //TODO
+        return null;
+    }
+
+    char Run(Texture2D texture2D)
+    {
+        Tensor input = new(texture2D);
+
         // TODO: Update text with the model output
+
+        input.Dispose();
         return 'a';
     }
 }
