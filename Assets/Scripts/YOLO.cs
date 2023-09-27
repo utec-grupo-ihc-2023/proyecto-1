@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
 using TMPro;
 using Unity.Barracuda;
+using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
@@ -42,10 +44,35 @@ public class YOLO : MonoBehaviour
         worker.Dispose();
     }
 
-    Texture2D ProcessImage(XRCpuImage image)
+    // https://docs.unity3d.com/Packages/com.unity.xr.arfoundation@4.0/manual/cpu-camera-image.html
+    // TODO: Make this async
+    unsafe Texture2D ProcessImage(XRCpuImage image)
     {
-        //TODO
-        return null;
+        var conversionParams = new XRCpuImage.ConversionParams
+        {
+            inputRect = new RectInt(0, 0, image.width, image.height),
+            outputDimensions = new Vector2Int(image.width, image.height),
+            outputFormat = TextureFormat.RGB24,
+            transformation = XRCpuImage.Transformation.None
+        };
+
+        int size = image.GetConvertedDataSize(conversionParams);
+        var buffer = new NativeArray<byte>(size, Allocator.Temp);
+
+        image.Convert(conversionParams, new IntPtr(buffer.GetUnsafePtr()), buffer.Length);
+
+        Texture2D texture2D = new(
+            conversionParams.outputDimensions.x,
+            conversionParams.outputDimensions.y,
+            conversionParams.outputFormat,
+            false
+        );
+
+        texture2D.LoadRawTextureData(buffer);
+        texture2D.Apply();
+
+        buffer.Dispose();
+        return texture2D;
     }
 
     char Run(Texture2D texture2D)
