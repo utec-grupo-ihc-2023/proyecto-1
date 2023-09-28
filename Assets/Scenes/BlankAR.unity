@@ -358,7 +358,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 893b5bdcb835c22e4ac0c9244ed22b2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nnModel: {fileID: 0}
+  nnModel: {fileID: 5022602860645237092, guid: 5b09ba0e11b1dcc7989f6eea80d879c5, type: 3}
   inputCamera: {fileID: 1354141928}
   outputText: {fileID: 1058843823}
 --- !u!1 &1058843821
