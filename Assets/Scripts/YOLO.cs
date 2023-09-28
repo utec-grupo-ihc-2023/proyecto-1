@@ -26,16 +26,23 @@ public class YOLO : MonoBehaviour
     {
         model = ModelLoader.Load(nnModel);
         worker = WorkerFactory.CreateWorker(model);
+
+        StartCoroutine(UpdateText());
     }
 
-    // Update is called once per frame
-    void Update()
+    // TODO: Make this async
+    IEnumerator UpdateText()
     {
-        if(inputCamera.TryAcquireLatestCpuImage(out XRCpuImage image))
+        while(true)
         {
-            outputText.text = Run(ProcessImage(image)).ToString();
+            yield return new WaitForSeconds(1);
 
-            image.Dispose();
+            if(inputCamera.TryAcquireLatestCpuImage(out XRCpuImage image))
+            {
+                outputText.text = Run(ProcessImage(image));
+
+                image.Dispose();
+            }
         }
     }
 
@@ -45,7 +52,6 @@ public class YOLO : MonoBehaviour
     }
 
     // https://docs.unity3d.com/Packages/com.unity.xr.arfoundation@4.0/manual/cpu-camera-image.html
-    // TODO: Make this async
     unsafe Texture2D ProcessImage(XRCpuImage image)
     {
         var conversionParams = new XRCpuImage.ConversionParams
@@ -75,18 +81,33 @@ public class YOLO : MonoBehaviour
         return texture2D;
     }
 
-    char Run(Texture2D texture2D)
+    Texture2D ResizeTexture(Texture2D source, int newWidth, int newHeight)
     {
-        Tensor input = new(texture2D);
+        RenderTexture rt = RenderTexture.GetTemporary(newWidth, newHeight);
+        RenderTexture.active = rt;
+        Graphics.Blit(source, rt);
+        Texture2D result = new(newWidth, newHeight, source.format, false);
 
-        // TODO: Preprocess input
+        result.ReadPixels(new Rect(0, 0, newWidth, newHeight), 0, 0);
+        result.Apply();
+
+        RenderTexture.active = null;
+        RenderTexture.ReleaseTemporary(rt);
+        return result;
+    }
+
+    string Run(Texture2D texture2D)
+    {
+        Tensor input = new(ResizeTexture(texture2D, 640, 640));
 
         Tensor output = worker.Execute(input).PeekOutput();
 
         // TODO: Postprocess output
 
+        string res = output.shape.ToString();
+
         input.Dispose();
         output.Dispose();
-        return 'a';
+        return res;
     }
 }
